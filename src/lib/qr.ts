@@ -1,4 +1,5 @@
 import jsQR, { type QRCode } from "jsqr";
+import QRCodeGen from "qrcode";
 
 export const htmlImageToByteArray = (
 	image: HTMLImageElement,
@@ -24,3 +25,22 @@ export const readQRCode = (
 	jsQR(bytes, width, height, {
 		inversionAttempts: "attemptBoth",
 	});
+
+export const generateQRCode = (text: string): Promise<string> => {
+	return new Promise((resolve, reject) => {
+		QRCodeGen.toDataURL(
+			text,
+			{
+				width: 512,
+			},
+			(error, url) => {
+				if (error) {
+					reject(error);
+					return;
+				}
+
+				resolve(url);
+			},
+		);
+	});
+};
