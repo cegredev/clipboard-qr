@@ -3,9 +3,10 @@
 	import { dataUrlToFile, generateQRCode, QR_SIZES } from "./lib/qr";
 	import type { QrOptions } from "./lib/types";
 
+	const searchParams = new URLSearchParams(window.location.search);
 	const DEFAULT_QR_SIZE: (typeof QR_SIZES)[number] = 512;
 
-	let qrText: string = "";
+	let qrText: string = searchParams.get("text") ?? "";
 	let qrOptions: QrOptions = {
 		size: DEFAULT_QR_SIZE,
 	};
@@ -77,7 +78,7 @@
 		await handleImageUpdate(file);
 	}
 
-	function focusElement(node: HTMLInputElement) {
+	function _focusElement(node: HTMLInputElement) {
 		node.focus();
 	}
 </script>
@@ -85,14 +86,13 @@
 <main on:paste={handlePaste}>
 	<div class="grid grid-cols-2 gap-4">
 		<div class="flex flex-col justify-center items-center gap-4">
-			<label class="input">
+			<label class="input w-full">
 				Text
 				<input
 					type="text"
 					placeholder="Your text"
-					class="w-full"
 					bind:value={qrText}
-					use:focusElement
+					use:_focusElement
 				/>
 			</label>
 
@@ -120,7 +120,7 @@
 		</div>
 		<div class="flex flex-col items-center gap-4">
 			{#if qrImage}
-				<img src={qrImage} width={512} alt="QR Code" />
+				<img src={qrImage} width={DEFAULT_QR_SIZE} alt="QR Code" />
 			{/if}
 			<input
 				type="file"
