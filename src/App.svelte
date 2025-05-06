@@ -5,7 +5,7 @@
 
 	const DEFAULT_QR_SIZE: (typeof QR_SIZES)[number] = 512;
 
-	let qrText: string = "f";
+	let qrText: string = "";
 	let qrOptions: QrOptions = {
 		size: DEFAULT_QR_SIZE,
 	};
@@ -68,17 +68,33 @@
 			]);
 		}
 	}
+
+	async function handleFileUpload(event: Event) {
+		const input = event.target as HTMLInputElement;
+		if (!input.files || input.files.length === 0) return;
+
+		const file = input.files[0];
+		await handleImageUpdate(file);
+	}
+
+	function focusElement(node: HTMLInputElement) {
+		node.focus();
+	}
 </script>
 
 <main on:paste={handlePaste}>
 	<div class="grid grid-cols-2 gap-4">
 		<div class="flex flex-col justify-center items-center gap-4">
-			<input
-				type="text"
-				placeholder="Your text"
-				class="input w-full"
-				bind:value={qrText}
-			/>
+			<label class="input">
+				Text
+				<input
+					type="text"
+					placeholder="Your text"
+					class="w-full"
+					bind:value={qrText}
+					use:focusElement
+				/>
+			</label>
 
 			<div class="join">
 				{#each QR_SIZES as size}
@@ -102,8 +118,15 @@
 				</button>
 			</div>
 		</div>
-		<div>
-			<img src={qrImage} width={512} alt="QR Code" />
+		<div class="flex flex-col items-center gap-4">
+			{#if qrImage}
+				<img src={qrImage} width={512} alt="QR Code" />
+			{/if}
+			<input
+				type="file"
+				class="file-input"
+				on:change={handleFileUpload}
+			/>
 		</div>
 	</div>
 </main>
