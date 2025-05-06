@@ -1,5 +1,8 @@
 import jsQR, { type QRCode } from "jsqr";
 import QRCodeGen from "qrcode";
+import type { QrOptions } from "./types";
+
+export const QR_SIZES = [128, 256, 512, 768, 1024, 1536, 2048] as const;
 
 export const htmlImageToByteArray = (
 	image: HTMLImageElement,
@@ -17,6 +20,13 @@ export const htmlImageToByteArray = (
 	return rgbaArray;
 };
 
+export const dataUrlToFile = async (url: string): Promise<File> => {
+	const blob = await fetch(url).then((res) => res.blob());
+	const file = new File([blob], "qrcode.png", { type: "image/png" });
+
+	return file;
+};
+
 export const readQRCode = (
 	bytes: Uint8ClampedArray,
 	width: number,
@@ -26,12 +36,15 @@ export const readQRCode = (
 		inversionAttempts: "attemptBoth",
 	});
 
-export const generateQRCode = (text: string): Promise<string> => {
+export const generateQRCode = (
+	text: string,
+	options: QrOptions,
+): Promise<string> => {
 	return new Promise((resolve, reject) => {
 		QRCodeGen.toDataURL(
 			text,
 			{
-				width: 512,
+				width: options.size,
 			},
 			(error, url) => {
 				if (error) {

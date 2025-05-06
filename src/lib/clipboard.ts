@@ -1,13 +1,8 @@
 import { htmlImageToByteArray, readQRCode } from "./qr";
 
 export const tryReadQRCodeUrlFromClipboard = async (
-	clipboardData: DataTransfer,
+	file: File,
 ): Promise<string | undefined> => {
-	if (clipboardData.files.length === 0) return;
-
-	const file = clipboardData.files[0];
-	if (!file) return;
-
 	const image = await extractImageFromFile(file);
 	if (!image) return;
 
