@@ -100,8 +100,24 @@
 </script>
 
 <main on:paste={handlePaste}>
-	<div class="flex flex-row flex-wrap gap-8 justify-center">
-		<div class="flex flex-col justify-center items-center gap-4 m-4">
+	<div class="gap-8 grid grid-cols-1 2xl:grid-cols-2">
+		<div class="flex flex-col items-center gap-4 m-4 2xl:order-2">
+			{#if qrImage}
+				<img src={qrImage} width={DEFAULT_QR_SIZE} alt="QR Code" />
+			{/if}
+			<div class="flex flex-row justify-center gap-4">
+				<input
+					type="file"
+					class="file-input"
+					on:change={handleFileUpload}
+				/>
+				<button class="btn" on:click={handleQrPaste}>Paste</button>
+			</div>
+		</div>
+
+		<div
+			class="flex flex-col justify-center items-center gap-4 m-4 2xl:order-1"
+		>
 			<label class="input w-full">
 				Text
 				<input
@@ -149,20 +165,6 @@
 				<button class="btn" on:click={() => handleCopy("image")}>
 					Copy QR-Code
 				</button>
-			</div>
-		</div>
-
-		<div class="flex flex-col items-center gap-4 m-4">
-			{#if qrImage}
-				<img src={qrImage} width={DEFAULT_QR_SIZE} alt="QR Code" />
-			{/if}
-			<div class="flex flex-row justify-center gap-4">
-				<input
-					type="file"
-					class="file-input"
-					on:change={handleFileUpload}
-				/>
-				<button class="btn" on:click={handleQrPaste}>Paste</button>
 			</div>
 		</div>
 	</div>
