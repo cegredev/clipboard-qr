@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tryReadQRCodeUrlFromClipboard } from "./lib/clipboard";
 	import { dataUrlToFile, generateQRCode, QR_SIZES } from "./lib/qr";
+	import QrTextInput from "./lib/QrTextInput.svelte";
 	import type { QrOptions } from "./lib/types";
 
 	const searchParams = new URLSearchParams(window.location.search);
@@ -93,10 +94,6 @@
 			break;
 		}
 	}
-
-	function _focusElement(node: HTMLInputElement) {
-		node.focus();
-	}
 </script>
 
 <main on:paste={handlePaste}>
@@ -118,15 +115,7 @@
 		<div
 			class="flex flex-col justify-center items-center gap-4 m-4 2xl:order-1"
 		>
-			<label class="input w-full">
-				Text
-				<input
-					type="text"
-					placeholder="Your text"
-					bind:value={qrText}
-					use:_focusElement
-				/>
-			</label>
+			<QrTextInput bind:value={qrText} />
 
 			<div class="join">
 				{#each QR_SIZES as size}
