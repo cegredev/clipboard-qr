@@ -78,14 +78,29 @@
 		await handleImageUpdate(file);
 	}
 
+	async function handleQrPaste() {
+		const items = await navigator.clipboard.read();
+
+		for (const item of items) {
+			const type = item.types.find((type) => type.startsWith("image/"));
+			if (!type) continue;
+
+			const file = await item.getType(type);
+			if (!file) continue;
+
+			await handleImageUpdate(new File([file], "qr.png"));
+			break;
+		}
+	}
+
 	function _focusElement(node: HTMLInputElement) {
 		node.focus();
 	}
 </script>
 
 <main on:paste={handlePaste}>
-	<div class="grid grid-cols-2 gap-4">
-		<div class="flex flex-col justify-center items-center gap-4">
+	<div class="flex flex-row flex-wrap gap-8 justify-center">
+		<div class="flex flex-col justify-center items-center gap-4 m-4">
 			<label class="input w-full">
 				Text
 				<input
@@ -103,7 +118,7 @@
 						type="radio"
 						name="size"
 						aria-label={`${size}px`}
-						checked={size === 512}
+						checked={size === DEFAULT_QR_SIZE}
 						on:click={() => (qrOptions.size = size)}
 					/>
 				{/each}
@@ -118,15 +133,19 @@
 				</button>
 			</div>
 		</div>
-		<div class="flex flex-col items-center gap-4">
+
+		<div class="flex flex-col items-center gap-4 m-4">
 			{#if qrImage}
 				<img src={qrImage} width={DEFAULT_QR_SIZE} alt="QR Code" />
 			{/if}
-			<input
-				type="file"
-				class="file-input"
-				on:change={handleFileUpload}
-			/>
+			<div class="flex flex-row justify-center gap-4">
+				<input
+					type="file"
+					class="file-input"
+					on:change={handleFileUpload}
+				/>
+				<button class="btn" on:click={handleQrPaste}>Paste</button>
+			</div>
 		</div>
 	</div>
 </main>
