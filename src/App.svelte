@@ -10,6 +10,7 @@
 	let qrOptions: QrOptions = {
 		size: DEFAULT_QR_SIZE,
 	};
+	let qrCustomSize: boolean = false;
 	let qrImage: string | null = null;
 
 	$: (qrText || qrOptions) && handleTextUpdate();
@@ -119,10 +120,27 @@
 						name="size"
 						aria-label={`${size}px`}
 						checked={size === DEFAULT_QR_SIZE}
-						on:click={() => (qrOptions.size = size)}
+						on:click={() => {
+							qrOptions.size = size;
+							qrCustomSize = false;
+						}}
 					/>
 				{/each}
+				<input
+					class="join-item btn"
+					type="radio"
+					name="size"
+					aria-label={"Custom"}
+					on:click={() => (qrCustomSize = true)}
+				/>
 			</div>
+
+			{#if qrCustomSize}
+				<label class="input w-full">
+					Custom size
+					<input type="number" bind:value={qrOptions.size} />
+				</label>
+			{/if}
 
 			<div class="join">
 				<button class="btn" on:click={() => handleCopy("text")}>
