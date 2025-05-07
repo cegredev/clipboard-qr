@@ -3,6 +3,7 @@ import QRCodeGen from "qrcode";
 import type { QrOptions } from "./types";
 
 export const QR_SIZES = [128, 256, 512, 768, 1024, 1536, 2048] as const;
+export const DEFAULT_QR_SIZE: (typeof QR_SIZES)[number] = 512;
 
 export const htmlImageToByteArray = (
 	image: HTMLImageElement,

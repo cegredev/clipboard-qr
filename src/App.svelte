@@ -1,17 +1,16 @@
 <script lang="ts">
 	import { tryReadQRCodeUrlFromClipboard } from "./lib/clipboard";
-	import { dataUrlToFile, generateQRCode, QR_SIZES } from "./lib/qr";
+	import { dataUrlToFile, DEFAULT_QR_SIZE, generateQRCode } from "./lib/qr";
+	import QrSizeInput from "./lib/QrSizeInput.svelte";
 	import QrTextInput from "./lib/QrTextInput.svelte";
 	import type { QrOptions } from "./lib/types";
 
 	const searchParams = new URLSearchParams(window.location.search);
-	const DEFAULT_QR_SIZE: (typeof QR_SIZES)[number] = 512;
 
 	let qrText: string = searchParams.get("text") ?? "";
 	let qrOptions: QrOptions = {
 		size: DEFAULT_QR_SIZE,
 	};
-	let qrCustomSize: boolean = false;
 	let qrImage: string | null = null;
 
 	$: (qrText || qrOptions) && handleTextUpdate();
@@ -117,35 +116,7 @@
 		>
 			<QrTextInput bind:value={qrText} />
 
-			<div class="join">
-				{#each QR_SIZES as size}
-					<input
-						class="join-item btn"
-						type="radio"
-						name="size"
-						aria-label={`${size}px`}
-						checked={size === DEFAULT_QR_SIZE}
-						on:click={() => {
-							qrOptions.size = size;
-							qrCustomSize = false;
-						}}
-					/>
-				{/each}
-				<input
-					class="join-item btn"
-					type="radio"
-					name="size"
-					aria-label={"Custom"}
-					on:click={() => (qrCustomSize = true)}
-				/>
-			</div>
-
-			{#if qrCustomSize}
-				<label class="input w-full">
-					Custom size
-					<input type="number" bind:value={qrOptions.size} />
-				</label>
-			{/if}
+			<QrSizeInput bind:size={qrOptions.size} />
 
 			<div class="join">
 				<button class="btn" on:click={() => handleCopy("text")}>
