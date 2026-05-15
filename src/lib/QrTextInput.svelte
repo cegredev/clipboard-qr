@@ -1,9 +1,10 @@
 <script lang="ts">
-	export let value: string = "";
-	let inputValue: string = value;
-	let debounceTimeout: NodeJS.Timeout | null = null;
+	let { value = $bindable() }: { value: string } = $props();
 
-	$: if (inputValue !== value) {
+	let inputValue: string = $state(value);
+	let debounceTimeout: NodeJS.Timeout | null = $state(null);
+
+	function doUpdate() {
 		if (debounceTimeout) clearTimeout(debounceTimeout);
 
 		debounceTimeout = setTimeout(() => {
@@ -21,6 +22,7 @@
 		type="text"
 		placeholder="Your text"
 		bind:value={inputValue}
+		oninput={doUpdate}
 		use:focusElement
 	/>
 </label>

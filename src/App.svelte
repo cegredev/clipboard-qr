@@ -8,13 +8,22 @@
 
 	const searchParams = new URLSearchParams(window.location.search);
 
-	let qrText: string = searchParams.get("text") ?? "";
-	let qrOptions: QrOptions = {
+	let qrText: string = $state(searchParams.get("text") ?? "");
+	let qrOptions: QrOptions = $state({
 		size: DEFAULT_QR_SIZE,
-	};
-	let qrImage: string | null = null;
+	});
+	let qrImage: string | null = $state(null);
 
-	$: (qrText || qrOptions) && handleTextUpdate();
+	$effect(() => {
+		if (qrText === "") {
+			qrImage = null;
+			return;
+		}
+
+		generateQRCode(qrText, qrOptions).then((val) => {
+			qrImage = val;
+		});
+	});
 
 	onMount(async () => {
 		const qrCode = await generateQRCode(
@@ -23,16 +32,6 @@
 		);
 		qrImage = qrCode;
 	});
-
-	async function handleTextUpdate() {
-		if (qrText === "") {
-			qrImage = null;
-			return;
-		}
-
-		const qrCode = await generateQRCode(qrText, qrOptions);
-		qrImage = qrCode;
-	}
 
 	async function handleImageUpdate(image: File) {
 		const text = await tryReadQRCodeUrlFromClipboard(image);
@@ -58,7 +57,6 @@
 			const text = clipboardData.getData("text/plain");
 
 			qrText = text;
-			await handleTextUpdate();
 		}
 	}
 
@@ -78,6 +76,20 @@
 				}),
 			]);
 		}
+	}
+
+	async function handleDownload() {
+		if (!qrImage) return;
+
+		const file = await dataUrlToFile(qrImage);
+		const url = URL.createObjectURL(file);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = "qr-code.png";
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
 	}
 
 	async function handleFileUpload(event: Event) {
@@ -104,7 +116,7 @@
 	}
 </script>
 
-<main on:paste={handlePaste}>
+<main onpaste={handlePaste}>
 	<div class="gap-8 grid grid-cols-1 2xl:grid-cols-2">
 		<div class="flex flex-col items-center gap-4 m-4 2xl:order-2">
 			{#if qrImage}
@@ -114,9 +126,9 @@
 				<input
 					type="file"
 					class="file-input"
-					on:change={handleFileUpload}
+					onchange={handleFileUpload}
 				/>
-				<button class="btn" on:click={handleQrPaste}>Paste</button>
+				<button class="btn" onclick={handleQrPaste}>Paste</button>
 			</div>
 		</div>
 
@@ -128,11 +140,14 @@
 			<QrSizeInput bind:size={qrOptions.size} />
 
 			<div class="join">
-				<button class="btn" on:click={() => handleCopy("text")}>
+				<button class="btn" onclick={() => handleCopy("text")}>
 					Copy text
 				</button>
-				<button class="btn" on:click={() => handleCopy("image")}>
+				<button class="btn" onclick={() => handleCopy("image")}>
 					Copy QR-Code
+				</button>
+				<button class="btn" onclick={() => handleDownload()}>
+					Download
 				</button>
 			</div>
 		</div>
