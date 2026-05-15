@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import { tryReadQRCodeUrlFromClipboard } from "./lib/clipboard";
 	import { dataUrlToFile, DEFAULT_QR_SIZE, generateQRCode } from "./lib/qr";
 	import QrSizeInput from "./lib/QrSizeInput.svelte";
@@ -14,6 +15,14 @@
 	let qrImage: string | null = null;
 
 	$: (qrText || qrOptions) && handleTextUpdate();
+
+	onMount(async () => {
+		const qrCode = await generateQRCode(
+			"https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+			qrOptions,
+		);
+		qrImage = qrCode;
+	});
 
 	async function handleTextUpdate() {
 		if (qrText === "") {
