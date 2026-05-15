@@ -17,7 +17,6 @@
 </script>
 
 <label class="input w-full">
-	Text
 	<input
 		type="text"
 		placeholder="Your text"
